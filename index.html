@@ -18,6 +18,7 @@
   <script src="bower_components/angular-resource/angular-resource.min.js"></script>
   <script src="bower_components/angular-animate/angular-animate.min.js"></script>
   <script src="bower_components/angular-cookies/angular-cookies.min.js"></script>
+  <script src="bower_components/angular-sanitize/angular-sanitize.min.js"></script>
   <script src="bower_components/semantic/dist/semantic.min.js"></script>
 
   <script src="js/main.js"></script>
@@ -43,7 +44,30 @@
   </div>
 
   <div class="row">
-
+    <div class="ui column blue segment"
+         ng-class="{'loading': yolo.loading}">
+      <div class="ui huge feed">
+        <div class="ui event vertical segment" ng-repeat="post in yolo.feed.posts | filter:search:strict">
+          <div class="label">
+            <img src="css/lego.jpg">
+          </div>
+          <div class="content">
+            <div class="summary">
+              <h2><a ng-href="{{post.link}}" target="_blank">{{post.title}}</a></h2>
+              {{post}}
+            </div>
+            <div class="extra text">
+              <div ng-bind-html="post.content"></div>
+            </div>
+            <div class="meta">
+              <a class="like">
+                <i class="like icon"></i> FAVORITE ICON
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
 </div>
