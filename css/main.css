@@ -1,0 +1,29 @@
+/*******************************
+            Global
+*******************************/
+
+html,
+body {
+  height: 100%;
+  background: url(sativa.png) repeat;
+  padding: 2em;
+}
+
+/* When Showing */
+.animate-show.ng-hide-remove {
+  -webkit-animation: flipInX 1.0s;
+}
+
+/* When hiding */
+.animate-show.ng-hide-add {
+  -webkit-animation: flipOutX 1s;
+  display: block !important;
+}
+
+/* Hide */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
