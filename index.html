@@ -25,7 +25,7 @@
 </head>
 <body ng-app="yolorss" ng-controller="main as yolo">
 
-<div class="ui container">
+<div class="ui container grid">
 
   <div class="row">
     <h1 class="ui header">
@@ -40,29 +40,45 @@
         Last Visit
         <div class="detail">{{yolo.lastVisit}}</div>
       </div>
+
     </h1>
+
   </div>
 
   <div class="row">
-    <div class="ui column blue segment"
-         ng-class="{'loading': yolo.loading}">
-      <div class="ui huge feed">
-        <div class="ui event vertical segment" ng-repeat="post in yolo.feed.posts | filter:search:strict">
-          <div class="label">
-            <img src="css/lego.jpg">
-          </div>
-          <div class="content">
-            <div class="summary">
-              <h2><a ng-href="{{post.link}}" target="_blank">{{post.title}}</a></h2>
-              {{post}}
+    <div class="ui five item menu">
+      <a class="item">US News</a>
+      <a class="item">World News</a>
+      <a class="item">Sports</a>
+      <a class="item">Weather</a>
+      <a class="item">Technology</a>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column">
+      <div class="ui blue segment"
+           ng-class="{'loading': yolo.loading}">
+        <div class="ui huge feed">
+          <div class="ui event vertical segment" ng-repeat="post in yolo.feed.posts | filter:search:strict">
+            <div class="label">
+              <img src="css/lego.jpg">
             </div>
-            <div class="extra text">
-              <div ng-bind-html="post.content"></div>
-            </div>
-            <div class="meta">
-              <a class="like">
-                <i class="like icon"></i> FAVORITE ICON
-              </a>
+            <div class="content">
+              <div class="summary">
+                <h2><a ng-href="{{post.link}}" target="_blank">{{post.title}}</a></h2>
+
+              </div>
+              <div class="extra text">
+                <div ng-bind-html="post.content"></div>
+              </div>
+              <div class="meta">
+                <a class="like"
+                   ng-class="{'active': post.favorited}"
+                   ng-click="post.favorited = !post.favorited">
+                  <i class="like icon"></i> Favorite
+                </a>
+              </div>
             </div>
           </div>
         </div>

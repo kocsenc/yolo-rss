@@ -18,7 +18,23 @@ function MainCtrl($resource, $cookies, FeedService) {
   var vm = this;
   vm.loading = true;
 
-  FeedService.parseFeed('http://news.ycombinator.com/rss').then(function (res) {
+  var rssFeeds = [
+    {
+      title: 'CNN',
+      url: 'http://rss.cnn.com/rss/cnn_topstories.rss'
+    },
+    {
+      title: 'Hacker News',
+      url: 'http://news.ycombinator.com/rss'
+    },
+    {
+      title: 'TechCrunch',
+      url: 'http://feeds.feedburner.com/TechCrunch'
+    }
+
+  ];
+
+  FeedService.parseFeed(rssFeeds[2].url).then(function (res) {
     vm.loading = false;
 
     console.log(res);
