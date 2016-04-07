@@ -42,21 +42,37 @@
       </div>
 
     </h1>
-
   </div>
 
   <div class="row">
-    <div class="ui five item menu">
-      <a class="item">US News</a>
-      <a class="item">World News</a>
-      <a class="item">Sports</a>
-      <a class="item">Weather</a>
-      <a class="item">Technology</a>
+    <div class="ui five item green menu">
+      <a class="item"
+           ng-click="yolo.selectCategory(0)"
+           ng-class="{'active': yolo.categorySelected == 0}">US News
+      </a>
+      <a class="item"
+           ng-click="yolo.selectCategory(1)"
+           ng-class="{'active': yolo.categorySelected == 1}">World News
+      </a>
+      <a class="item"
+           ng-click="yolo.selectCategory(2)"
+           ng-class="{'active': yolo.categorySelected == 2}">Sports
+      </a>
+      <a class="item"
+           ng-click="yolo.selectCategory(3)"
+           ng-class="{'active': yolo.categorySelected == 3}">Weather
+      </a>
+      <a class="item"
+           ng-click="yolo.selectCategory(4)"
+           ng-class="{'active': yolo.categorySelected == 4}">Technology
+      </a>
     </div>
   </div>
 
   <div class="row">
     <div class="column">
+      <h3>{{yolo.feed.title}}</h3>
+
       <div class="ui blue segment"
            ng-class="{'loading': yolo.loading}">
         <div class="ui huge feed">
@@ -73,9 +89,10 @@
                 <div ng-bind-html="post.content"></div>
               </div>
               <div class="meta">
+                {{post.publishedDate}}<br>
                 <a class="like"
                    ng-class="{'active': post.favorited}"
-                   ng-click="post.favorited = !post.favorited">
+                   ng-click="yolo.favorite(post)">
                   <i class="like icon"></i> Favorite
                 </a>
               </div>
