@@ -7,45 +7,52 @@
  * # MainCtrl
  * Controller of the hayboys app
  */
-var app = angular.module('yolorss', ['ngResource', 'ngAnimate', 'ngCookies', 'ngSanitize']);
+var app = angular.module('yolorss', ['ngResource', 'ngAnimate', 'ngCookies', 'ngSanitize', 'infinite-scroll']);
 
 
 angular
   .module('yolorss')
-  .controller('main', ['$resource', '$cookies', 'FeedService', MainCtrl]);
+  .controller('main', ['$timeout', '$cookies', 'FeedService', MainCtrl]);
 
-function MainCtrl($resource, $cookies, FeedService) {
+function MainCtrl($timeout, $cookies, FeedService) {
   var vm = this;
 
   /* Variables */
-  var rssFeeds = [
+  vm.rssFeeds = [
     {
       title: 'USA Today',
+      icon: 'newspaper',
       url: 'http://rssfeeds.usatoday.com/usatoday-NewsTopStories'
     },
     {
       title: 'BBC World News',
+      icon: 'world',
       url: 'http://feeds.bbci.co.uk/news/world/rss.xml'
     },
     {
-      title: 'ESPN Headlines',
+      title: 'ESPN',
+      icon: 'soccer',
       url: ' http://sports.espn.go.com/espn/rss/news'
     },
     {
-      title: 'The Weather Channel®',
+      title: 'Weather Channel®',
+      icon: 'cloud',
       url: 'http://rss.weather.com/rss/national/rss_nwf_rss.xml?cm_ven=NWF&cm_cat=rss&par=NWF_rss'
     },
     {
       title: 'TechCrunch',
+      icon: 'game',
       url: 'http://feeds.feedburner.com/TechCrunch'
     }
   ];
-
   vm.categorySelected = 0;
+  vm.loading = false;
+  vm.limit = 5;
 
   /* Functions */
   vm.selectCategory = selectCategory;
   vm.favorite = favorite;
+  vm.onInfiniteScroll = onInfiniteScroll;
 
   /* Init */
   selectCategory(0);
@@ -59,7 +66,7 @@ function MainCtrl($resource, $cookies, FeedService) {
     vm.loading = true;
     vm.categorySelected = number;
 
-    FeedService.parseFeed(rssFeeds[number].url).then(function (res) {
+    FeedService.parseFeed(vm.rssFeeds[number].url).then(function (res) {
       vm.loading = false;
       var responseStatus = res.data.responseStatus;
       var f = res.data.responseData.feed;
@@ -71,6 +78,7 @@ function MainCtrl($resource, $cookies, FeedService) {
         posts: f.entries
       };
       populateFavorites(vm.feed.posts);
+      vm.limit = 5;
 
       /**
        * Posts have:
@@ -82,6 +90,16 @@ function MainCtrl($resource, $cookies, FeedService) {
        * -
        */
     });
+  }
+
+  function onInfiniteScroll() {
+    if (vm.limit <= 15) {
+      vm.loading = true;
+      $timeout(function () {
+        vm.limit += 2;
+        vm.loading = false;
+      }, 650, true);
+    }
   }
 
   function populateFavorites(posts) {

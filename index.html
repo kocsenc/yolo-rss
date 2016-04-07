@@ -19,6 +19,7 @@
   <script src="bower_components/angular-animate/angular-animate.min.js"></script>
   <script src="bower_components/angular-cookies/angular-cookies.min.js"></script>
   <script src="bower_components/angular-sanitize/angular-sanitize.min.js"></script>
+  <script src="bower_components/ngInfiniteScroll/build/ng-infinite-scroll.min.js"></script>
   <script src="bower_components/semantic/dist/semantic.min.js"></script>
 
   <script src="js/main.js"></script>
@@ -36,7 +37,7 @@
       </div>
       <small>One place for all your news</small>
 
-      <div class="ui blue label floated right">
+      <div class="ui blue label floated right" ng-if="yolo.lastVisit">
         Last Visit
         <div class="detail">{{yolo.lastVisit}}</div>
       </div>
@@ -47,24 +48,11 @@
   <div class="row">
     <div class="ui five item green menu">
       <a class="item"
-           ng-click="yolo.selectCategory(0)"
-           ng-class="{'active': yolo.categorySelected == 0}">US News
-      </a>
-      <a class="item"
-           ng-click="yolo.selectCategory(1)"
-           ng-class="{'active': yolo.categorySelected == 1}">World News
-      </a>
-      <a class="item"
-           ng-click="yolo.selectCategory(2)"
-           ng-class="{'active': yolo.categorySelected == 2}">Sports
-      </a>
-      <a class="item"
-           ng-click="yolo.selectCategory(3)"
-           ng-class="{'active': yolo.categorySelected == 3}">Weather
-      </a>
-      <a class="item"
-           ng-click="yolo.selectCategory(4)"
-           ng-class="{'active': yolo.categorySelected == 4}">Technology
+         ng-repeat="feed in yolo.rssFeeds track by $index"
+         ng-click="yolo.selectCategory($index)"
+         ng-class="{'active': yolo.categorySelected == $index}">
+        <i class="{{feed.icon}} icon"></i>
+        {{feed.title}}
       </a>
     </div>
   </div>
@@ -75,18 +63,21 @@
 
       <div class="ui blue segment"
            ng-class="{'loading': yolo.loading}">
-        <div class="ui huge feed">
-          <div class="ui event vertical segment" ng-repeat="post in yolo.feed.posts | filter:search:strict">
+        <div class="ui huge feed"
+             infinite-scroll-immediate-check="false"
+             infinite-scroll-disabled="yolo.loading"
+             infinite-scroll="yolo.onInfiniteScroll()">
+          <div class="ui event vertical segment"
+               ng-repeat="post in yolo.feed.posts | filter:search:strict | limitTo: yolo.limit">
             <div class="label">
               <img src="css/lego.jpg">
             </div>
             <div class="content">
               <div class="summary">
                 <h2><a ng-href="{{post.link}}" target="_blank">{{post.title}}</a></h2>
-
               </div>
               <div class="extra text">
-                <div ng-bind-html="post.content"></div>
+                <div ng-bind-html="post.content" class="fill"></div>
               </div>
               <div class="meta">
                 {{post.publishedDate}}<br>
