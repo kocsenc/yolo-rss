@@ -48,11 +48,23 @@ function MainCtrl($timeout, $cookies, FeedService) {
   vm.categorySelected = 0;
   vm.loading = false;
   vm.limit = 5;
+  vm.login = {
+    show: false,
+    buttonText: "Login",
+    form: {
+      username: "",
+      password: ""
+    },
+    loggedIn: false,
+    loggedInUser: ""
+  };
 
   /* Functions */
   vm.selectCategory = selectCategory;
   vm.favorite = favorite;
   vm.onInfiniteScroll = onInfiniteScroll;
+  vm.loginNow = loginNow;
+  vm.toggleLogin = toggleLogin;
 
   /* Init */
   selectCategory(0);
@@ -87,7 +99,6 @@ function MainCtrl($timeout, $cookies, FeedService) {
        * - author
        * - publishedDate
        * - content (html)
-       * -
        */
     });
   }
@@ -126,6 +137,41 @@ function MainCtrl($timeout, $cookies, FeedService) {
       $cookies.put(key, new Date().toString());
     }
     vm.lastVisit = $cookies.get(key);
+  }
+
+  function loginNow() {
+    if (!vm.login.loggedIn) {
+      console.log("logging in");
+      vm.login.loggedIn = true;
+      vm.login.loggedInUser = vm.login.form.username;
+      vm.login.buttonText = "Logout";
+      vm.login.form = {
+        username: "",
+        password: ""
+      }
+    }
+
+    vm.login.show = false;
+  }
+
+  function toggleLogin() {
+    if (vm.login.loggedIn) {
+      logout();
+    } else {
+      vm.login.show = !vm.login.show;
+      if (vm.login.show) {
+        vm.login.buttonText = "Hide"
+      } else {
+        vm.login.buttonText = "Login"
+      }
+    }
+  }
+
+  function logout() {
+    console.log("logging out");
+    vm.login.loggedIn = false;
+    vm.login.loggedInUser = null;
+    vm.login.buttonText = "Login";
   }
 }
 

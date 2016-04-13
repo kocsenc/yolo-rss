@@ -36,3 +36,6 @@ input[type=number]::-webkit-inner-spin-button {
   margin: 0;
 }
 
+.no-padding {
+  padding: 0px;
+}

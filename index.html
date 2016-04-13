@@ -29,20 +29,58 @@
 <div class="ui container grid">
 
   <div class="row">
-    <h1 class="ui header">
-      <i class="rss teal icon"></i>
+    <div class="eight wide column">
+      <h1 class="ui header">
+        <i class="rss teal icon"></i>
 
-      <div class="content">
-        Yolo RSS
+        <div class="content">
+          Yolo RSS
+        </div>
+        <small>One place for all your news</small>
+      </h1>
+    </div>
+    <div class="eight wide right aligned column">
+      <div class="row">
+        <div class="ui image large teal label" ng-show="yolo.login.loggedIn && yolo.login.loggedInUser">
+          <img src="css/lego.jpg">
+          Welcome, <b>{{yolo.login.loggedInUser}}</b>
+        </div>
+        <a class="ui green small button"
+           ng-click="yolo.toggleLogin()">
+          {{yolo.login.buttonText}}
+        </a>
       </div>
-      <small>One place for all your news</small>
+      <div class="row" ng-show="yolo.login.show">
+        <div class="sixteen wide column">
+          <form class="ui form">
+            <div class="field">
+              <input type="text"
+                     name="username"
+                     placeholder="Username"
+                     ng-model="yolo.login.form.username">
+            </div>
 
-      <div class="ui blue label floated right" ng-if="yolo.lastVisit">
+            <div class="field">
+              <div class="ui action input">
+                <input type="password"
+                       name="password"
+                       placeholder="Password"
+                       ng-model="yolo.login.form.password">
+                <button class="ui button"
+                        ng-click="yolo.loginNow()">
+                  Login or Create
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="ui blue label" ng-if="yolo.lastVisit" style="margin-top: 1em">
         Last Visit
         <div class="detail">{{yolo.lastVisit}}</div>
       </div>
-
-    </h1>
+    </div>
   </div>
 
   <div class="row">
@@ -57,10 +95,22 @@
     </div>
   </div>
 
+  <div class="row" style="padding: 0">
+    <div class="ten wide column">
+      <h1>{{yolo.feed.title}}</h1>
+    </div>
+    <div class="six wide column">
+      <div class="ui icon fluid input right aligned">
+        <input type="text"
+               placeholder="Search current articles..."
+               ng-model="search.$">
+        <i class="search icon"></i>
+      </div>
+    </div>
+  </div>
+
   <div class="row">
     <div class="column">
-      <h3>{{yolo.feed.title}}</h3>
-
       <div class="ui blue segment"
            ng-class="{'loading': yolo.loading}">
         <div class="ui huge feed"
@@ -68,10 +118,10 @@
              infinite-scroll-disabled="yolo.loading"
              infinite-scroll="yolo.onInfiniteScroll()">
           <div class="ui event vertical segment"
-               ng-repeat="post in yolo.feed.posts | filter:search:strict | limitTo: yolo.limit">
-            <div class="label">
-              <img src="css/lego.jpg">
-            </div>
+               ng-repeat="post in yolo.feed.posts | filter:search:strict | limitTo: yolo.limit | filter:search:strict">
+            <!--<div class="label">-->
+            <!--<img src="css/lego.jpg">-->
+            <!--</div>-->
             <div class="content">
               <div class="summary">
                 <h2><a ng-href="{{post.link}}" target="_blank">{{post.title}}</a></h2>
