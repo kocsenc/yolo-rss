@@ -32,7 +32,6 @@
     <div class="eight wide column">
       <h1 class="ui header">
         <i class="rss teal icon"></i>
-
         <div class="content">
           Yolo RSS
         </div>
@@ -44,6 +43,12 @@
         <div class="ui image large teal label" ng-show="yolo.login.loggedIn && yolo.login.loggedInUser">
           <img src="css/lego.jpg">
           Welcome, <b>{{yolo.login.loggedInUser}}</b>
+        </div>
+        <div class="ui vertical animated yellow button" ng-show="yolo.login.loggedIn">
+          <div class="hidden content">Favorites</div>
+          <div class="visible content">
+            <i class="favorite icon"></i>
+          </div>
         </div>
         <a class="ui green small button"
            ng-click="yolo.toggleLogin()">
