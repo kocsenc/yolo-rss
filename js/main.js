@@ -58,9 +58,11 @@ function MainCtrl($timeout, $cookies, FeedService) {
     loggedIn: false,
     loggedInUser: ""
   };
+  vm.newRSSUrl = "";
 
   /* Functions */
   vm.selectCategory = selectCategory;
+  vm.parseFeed = parseFeed;
   vm.favorite = favorite;
   vm.onInfiniteScroll = onInfiniteScroll;
   vm.loginNow = loginNow;
@@ -77,31 +79,43 @@ function MainCtrl($timeout, $cookies, FeedService) {
   function selectCategory(number) {
     vm.loading = true;
     vm.categorySelected = number;
-
-    FeedService.parseFeed(vm.rssFeeds[number].url).then(function (res) {
-      vm.loading = false;
-      var responseStatus = res.data.responseStatus;
-      var f = res.data.responseData.feed;
-      vm.feed = {
-        title: f.title,
-        link: f.link,
-        description: f.description,
-        type: f.type,
-        posts: f.entries
-      };
-      populateFavorites(vm.feed.posts);
-      vm.limit = 5;
-
-      /**
-       * Posts have:
-       * - title
-       * - link
-       * - author
-       * - publishedDate
-       * - content (html)
-       */
-    });
+    parseFeed(vm.rssFeeds[number].url);
   }
+
+  function parseFeed(url) {
+    if (url) {
+      FeedService.parseFeed(url).then(function (res) {
+        vm.loading = false;
+        var responseStatus = res.data.responseStatus;
+        if (responseStatus !== 200) {
+          // on eror
+          return;
+        }
+
+        var f = res.data.responseData.feed;
+        vm.feed = {
+          title: f.title,
+          link: f.link,
+          description: f.description,
+          type: f.type,
+          posts: f.entries
+        };
+        populateFavorites(vm.feed.posts);
+        vm.limit = 5;
+
+        /**
+         * Posts have:
+         * - title
+         * - link
+         * - author
+         * - publishedDate
+         * - content (html)
+         */
+      });
+      vm.newRSSUrl = "";
+    }
+  }
+
 
   function onInfiniteScroll() {
     if (vm.limit <= 15) {
@@ -173,6 +187,8 @@ function MainCtrl($timeout, $cookies, FeedService) {
     vm.login.loggedInUser = null;
     vm.login.buttonText = "Login";
   }
+
+
 }
 
 app.factory('FeedService', ['$http', function ($http) {

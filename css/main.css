@@ -37,5 +37,10 @@ input[type=number]::-webkit-inner-spin-button {
 }
 
 .no-padding {
-  padding: 0px;
+  padding: 0;
 }
+
+.ui.form .field {
+  margin: 0;
+}
+

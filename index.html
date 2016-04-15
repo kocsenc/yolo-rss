@@ -32,6 +32,7 @@
     <div class="eight wide column">
       <h1 class="ui header">
         <i class="rss teal icon"></i>
+
         <div class="content">
           Yolo RSS
         </div>
@@ -57,21 +58,24 @@
       </div>
       <div class="row" ng-show="yolo.login.show">
         <div class="sixteen wide column">
-          <form class="ui form">
+          <form class="ui small form" name="yolo.userForm">
             <div class="field">
               <input type="text"
                      name="username"
-                     placeholder="Username"
-                     ng-model="yolo.login.form.username">
+                     placeholder="Username (required)"
+                     ng-model="yolo.login.form.username"
+                     required>
             </div>
 
             <div class="field">
               <div class="ui action input">
                 <input type="password"
                        name="password"
-                       placeholder="Password"
-                       ng-model="yolo.login.form.password">
-                <button class="ui button"
+                       placeholder="Password (required)"
+                       ng-model="yolo.login.form.password"
+                       required>
+                <button class="ui teal button"
+                        ng-disabled="yolo.userForm.$invalid"
                         ng-click="yolo.loginNow()">
                   Login or Create
                 </button>
@@ -89,28 +93,51 @@
   </div>
 
   <div class="row">
-    <div class="ui five item green menu">
-      <a class="item"
-         ng-repeat="feed in yolo.rssFeeds track by $index"
-         ng-click="yolo.selectCategory($index)"
-         ng-class="{'active': yolo.categorySelected == $index}">
-        <i class="{{feed.icon}} icon"></i>
-        {{feed.title}}
-      </a>
+    <div class="sixteen wide column">
+      <div class="ui five item green menu" style="margin-bottom: 0">
+        <a class="item"
+           ng-repeat="feed in yolo.rssFeeds track by $index"
+           ng-click="yolo.selectCategory($index)"
+           ng-class="{'active': yolo.categorySelected == $index}">
+          <i class="{{feed.icon}} icon"></i>
+          {{feed.title}}
+        </a>
+      </div>
+    </div>
+
+    <div class="sixteen wide column">
+      <div class="ui mini right labeled left fluid icon input">
+        <i class="orange rss icon"></i>
+        <input type="text"
+               ng-class="{'loading': yolo.loading}"
+               placeholder="Enter a valid RSS URL"
+               ng-model="yolo.newRSSUrl">
+        <button class="ui orange label"
+                ng-class="{'disabled' : !yolo.newRSSUrl}"
+                ng-click="yolo.parseFeed(yolo.newRSSUrl)">
+          View RSS
+        </button>
+      </div>
     </div>
   </div>
+
+  <!--<div class="row">-->
+
+
+  <!--</div>-->
 
   <div class="row" style="padding: 0">
     <div class="ten wide column">
       <h1>{{yolo.feed.title}}</h1>
     </div>
-    <div class="six wide column">
-      <div class="ui icon fluid input right aligned">
+    <div class="six wide right aligned column">
+      <div class="ui fluid icon input">
         <input type="text"
-               placeholder="Search current articles..."
+               placeholder="Search current articles"
                ng-model="search.$">
         <i class="search icon"></i>
       </div>
+
     </div>
   </div>
 
@@ -124,9 +151,6 @@
              infinite-scroll="yolo.onInfiniteScroll()">
           <div class="ui event vertical segment"
                ng-repeat="post in yolo.feed.posts | filter:search:strict | limitTo: yolo.limit | filter:search:strict">
-            <!--<div class="label">-->
-            <!--<img src="css/lego.jpg">-->
-            <!--</div>-->
             <div class="content">
               <div class="summary">
                 <h2><a ng-href="{{post.link}}" target="_blank">{{post.title}}</a></h2>
