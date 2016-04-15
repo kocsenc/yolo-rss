@@ -14,7 +14,7 @@
 
   <!-- JS Imports -->
   <script src="bower_components/jquery/dist/jquery.min.js"></script>
-  <script src="bower_components/angular/angular.js"></script>
+  <script src="bower_components/angular/angular.min.js"></script>
   <script src="bower_components/angular-resource/angular-resource.min.js"></script>
   <script src="bower_components/angular-animate/angular-animate.min.js"></script>
   <script src="bower_components/angular-cookies/angular-cookies.min.js"></script>
@@ -45,12 +45,14 @@
           <img src="css/lego.jpg">
           Welcome, <b>{{yolo.login.loggedInUser}}</b>
         </div>
-        <div class="ui vertical animated yellow button" ng-show="yolo.login.loggedIn">
+        <a class="ui vertical animated yellow button"
+           ng-show="yolo.login.loggedIn"
+           ng-click="yolo.viewFavs()">
           <div class="hidden content">Favorites</div>
           <div class="visible content">
             <i class="favorite icon"></i>
           </div>
-        </div>
+        </a>
         <a class="ui green small button"
            ng-click="yolo.toggleLogin()">
           {{yolo.login.buttonText}}
@@ -121,11 +123,6 @@
     </div>
   </div>
 
-  <!--<div class="row">-->
-
-
-  <!--</div>-->
-
   <div class="row" style="padding: 0">
     <div class="ten wide column">
       <h1>{{yolo.feed.title}}</h1>
@@ -137,7 +134,6 @@
                ng-model="search.$">
         <i class="search icon"></i>
       </div>
-
     </div>
   </div>
 
