@@ -32,7 +32,7 @@ function MainCtrl($timeout, $cookies, FeedService) {
     {
       title: 'ESPN',
       icon: 'soccer',
-      url: ' http://sports.espn.go.com/espn/rss/news'
+      url: 'http://sports.espn.go.com/espn/rss/news'
     },
     {
       title: 'Weather Channel®',
@@ -67,6 +67,7 @@ function MainCtrl($timeout, $cookies, FeedService) {
   vm.onInfiniteScroll = onInfiniteScroll;
   vm.loginNow = loginNow;
   vm.toggleLogin = toggleLogin;
+  vm.viewFavs = viewFavs;
 
   /* Init */
   selectCategory(0);
@@ -88,7 +89,7 @@ function MainCtrl($timeout, $cookies, FeedService) {
         vm.loading = false;
         var responseStatus = res.data.responseStatus;
         if (responseStatus !== 200) {
-          // on eror
+          // on error
           return;
         }
 
@@ -118,7 +119,7 @@ function MainCtrl($timeout, $cookies, FeedService) {
 
 
   function onInfiniteScroll() {
-    if (vm.limit <= 15) {
+    if (vm.limit <= 15 || vm.feed.link !== "/") {
       vm.loading = true;
       $timeout(function () {
         vm.limit += 2;
@@ -129,9 +130,9 @@ function MainCtrl($timeout, $cookies, FeedService) {
 
   function populateFavorites(posts) {
     angular.forEach(posts, function (post) {
-      var postCookie = $cookies.getObject(post.link);
-      if (postCookie) {
-        post.favorited = postCookie;
+      var cookieExists = !!$cookies.getObject(post.link);
+      if (cookieExists) {
+        post.favorited = true;
       }
     });
   }
@@ -141,8 +142,41 @@ function MainCtrl($timeout, $cookies, FeedService) {
    * @param post
    */
   function favorite(post) {
+    var cookieExists = !!$cookies.getObject(post.link);
+    if (cookieExists) {
+      $cookies.remove(post.link);
+    } else {
+      var rawPost = angular.toJson(post);
+      if (rawPost.length > 3000) {
+        rawPost = angular.toJson({
+          title: post.title,
+          link: post.link,
+          author: post.author,
+          publishedDate: post.publishedDate,
+          content: "Content too large to favorite. Click on title to view."
+        })
+      }
+      $cookies.put(post.link, rawPost);
+    }
     post.favorited = !post.favorited;
-    $cookies.put(post.link, post.favorited);
+  }
+
+  function viewFavs() {
+    vm.feed = {
+      title: "My Favorites",
+      link: "/",
+      description: "",
+      posts: []
+    };
+    populateFavorites(vm.feed.posts);
+
+    angular.forEach($cookies.getAll(), function (rawPost, key) {
+      if (key.indexOf("http") >= 0) {
+        var post = angular.fromJson(rawPost);
+        post.favorited = true;
+        vm.feed.posts.push(post);
+      }
+    });
   }
 
   function setLastVisited() {
@@ -155,7 +189,6 @@ function MainCtrl($timeout, $cookies, FeedService) {
 
   function loginNow() {
     if (!vm.login.loggedIn) {
-      console.log("logging in");
       vm.login.loggedIn = true;
       vm.login.loggedInUser = vm.login.form.username;
       vm.login.buttonText = "Logout";
@@ -182,19 +215,16 @@ function MainCtrl($timeout, $cookies, FeedService) {
   }
 
   function logout() {
-    console.log("logging out");
     vm.login.loggedIn = false;
     vm.login.loggedInUser = null;
     vm.login.buttonText = "Login";
   }
-
-
 }
 
 app.factory('FeedService', ['$http', function ($http) {
   return {
     parseFeed: function (url) {
-      return $http.jsonp('//ajax.googleapis.com/ajax/services/feed/load?v=1.0&num=50&callback=JSON_CALLBACK&q=' + encodeURIComponent(url));
+      return $http.jsonp('https://ajax.googleapis.com/ajax/services/feed/load?v=1.0&num=50&callback=JSON_CALLBACK&q=' + encodeURIComponent(url));
     }
   }
 }]);
