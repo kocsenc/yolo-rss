@@ -100,7 +100,7 @@
         <a class="item"
            ng-repeat="feed in yolo.rssFeeds track by $index"
            ng-click="yolo.selectCategory($index)"
-           ng-class="{'active': yolo.categorySelected == $index}">
+           ng-class="{'active': feed.selected}">
           <i class="{{feed.icon}} icon"></i>
           {{feed.title}}
         </a>
@@ -125,7 +125,7 @@
 
   <div class="row" style="padding: 0">
     <div class="ten wide column">
-      <h1>{{yolo.feed.title}}</h1>
+      <h1>{{yolo.title}}</h1>
     </div>
     <div class="six wide right aligned column">
       <div class="ui fluid icon input">
@@ -146,7 +146,7 @@
              infinite-scroll-disabled="yolo.loading"
              infinite-scroll="yolo.onInfiniteScroll()">
           <div class="ui event vertical segment"
-               ng-repeat="post in yolo.feed.posts | filter:search:strict | limitTo: yolo.limit | filter:search:strict">
+               ng-repeat="post in yolo.stories | filter:search:strict | limitTo: yolo.limit | filter:search:strict">
             <div class="content">
               <div class="summary">
                 <h2><a ng-href="{{post.link}}" target="_blank">{{post.title}}</a></h2>
@@ -163,6 +163,9 @@
                 </a>
               </div>
             </div>
+          </div>
+          <div ng-show="yolo.stories.length === 0">
+            No posts.
           </div>
         </div>
       </div>

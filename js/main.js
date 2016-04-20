@@ -22,30 +22,41 @@ function MainCtrl($timeout, $cookies, FeedService) {
     {
       title: 'USA Today',
       icon: 'newspaper',
-      url: 'http://rssfeeds.usatoday.com/usatoday-NewsTopStories'
+      url: 'http://rssfeeds.usatoday.com/usatoday-NewsTopStories',
+      selected: false
     },
     {
       title: 'BBC World News',
       icon: 'world',
-      url: 'http://feeds.bbci.co.uk/news/world/rss.xml'
+      url: 'http://feeds.bbci.co.uk/news/world/rss.xml',
+      selected: false
     },
     {
       title: 'ESPN',
       icon: 'soccer',
-      url: ' http://sports.espn.go.com/espn/rss/news'
+      url: ' http://sports.espn.go.com/espn/rss/news',
+      selected: false
     },
     {
       title: 'Weather Channel®',
       icon: 'cloud',
-      url: 'http://rss.weather.com/rss/national/rss_nwf_rss.xml?cm_ven=NWF&cm_cat=rss&par=NWF_rss'
+      url: 'http://rss.weather.com/rss/national/rss_nwf_rss.xml?cm_ven=NWF&cm_cat=rss&par=NWF_rss',
+      selected: false
     },
     {
       title: 'TechCrunch',
       icon: 'game',
-      url: 'http://feeds.feedburner.com/TechCrunch'
+      url: 'http://feeds.feedburner.com/TechCrunch',
+      selected: false
+    },
+    {
+      title: 'Favorites',
+      icon: '',
+      url: ''
     }
   ];
-  vm.categorySelected = 0;
+  vm.title = vm.rssFeeds[0].title;
+
   vm.loading = false;
   vm.limit = 5;
   vm.login = {
@@ -79,31 +90,67 @@ function MainCtrl($timeout, $cookies, FeedService) {
    */
   function selectCategory(number) {
     vm.loading = true;
-    vm.categorySelected = number;
-    parseFeed(vm.rssFeeds[number].url);
+    vm.title = '';
+    vm.stories = [];
+    vm.rssFeeds[number].selected = !vm.rssFeeds[number].selected;
+
+    var feeds = vm.rssFeeds.filter(function (feed) {
+      return feed.selected;
+    });
+
+    if (feeds.length === 0) {
+      vm.title = 'Please select at least one source.';
+      vm.loading = false;
+      return;
+    }
+
+    vm.title = feeds.map(function (feed) {
+      return feed.title;
+    }).join(', ');
+
+    feeds.forEach(function (feed) {
+      parseFeed(feed.url).then(function (posts) {
+        vm.stories = vm.stories.concat(posts);
+        vm.stories.sort(compare);
+        vm.stories.reverse();
+        populateFavorites(vm.stories);
+      });
+    });
+
+    function compare(a, b) {
+      var aDate = new Date(a.publishedDate);
+      var bDate = new Date(b.publishedDate);
+
+      if (aDate < bDate) {
+        return -1;
+      } else if (aDate > bDate) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }
+
+    vm.limit = 7;
+  }
+
+  function populateStories (url) {
+
   }
 
   function parseFeed(url) {
     if (url) {
-      FeedService.parseFeed(url).then(function (res) {
+      return FeedService.parseFeed(url).then(function (res) {
         vm.loading = false;
         var responseStatus = res.data.responseStatus;
         if (responseStatus !== 200) {
           // on error
-          return;
+          return {error: 'yup'};
         }
 
         var f = res.data.responseData.feed;
-        vm.feed = {
-          title: f.title,
-          link: f.link,
-          description: f.description,
-          type: f.type,
-          posts: f.entries
-        };
-        populateFavorites(vm.feed.posts);
-        vm.limit = 5;
+        vm.newRSSUrl = "";
 
+        return f.entries;
         /**
          * Posts have:
          * - title
@@ -113,16 +160,18 @@ function MainCtrl($timeout, $cookies, FeedService) {
          * - content (html)
          */
       });
-      vm.newRSSUrl = "";
     }
   }
 
-
   function onInfiniteScroll() {
-    if (vm.limit <= 15 || vm.feed.link !== "/") {
+    var selected = vm.rssFeeds.filter(function (feed) {
+      return feed.selected;
+    }).length;
+
+    if (vm.limit <= selected * 15) {
       vm.loading = true;
       $timeout(function () {
-        vm.limit += 2;
+        vm.limit += 5;
         vm.loading = false;
       }, 650, true);
     }
